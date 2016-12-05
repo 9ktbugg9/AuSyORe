@@ -13,7 +13,7 @@ int main(int args, char* argc[]) {
 		game.startLoop();
 	}
 	catch (int exeption) {
-		std::cout << "An exeption has occured ~ Error code: " << exeption << std::endl;
+		std::cout << "An exception has occured ~ Error code: " << exeption << std::endl;
 		system("pause");
 	}
 

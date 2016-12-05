@@ -10,12 +10,12 @@ bool CTexture::loadFromFile(std::string path) {
 
 	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
 	if (loadedSurface == nullptr)
-		std::cout << "-Unable to Load Image- Reason: " << IMG_GetError() << "  -Path: " << path.c_str();
+		std::cout << "-Unable to Load Image- Reason: " << IMG_GetError() << "  -Path: " << path.c_str() << std::endl;
 	else {
 		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xFF, 0x00, 0xFF));
 		newTexture = SDL_CreateTextureFromSurface(_renderer, loadedSurface);
 		if (newTexture == nullptr)
-			std::cout << "-Unable to Create Texture- Reason: " << SDL_GetError() << "  -Path: " << path.c_str();
+			std::cout << "-Unable to Create Texture- Reason: " << SDL_GetError() << "  -Path: " << path.c_str() << std::endl;
 		else {
 			_width = loadedSurface->w;
 			_height = loadedSurface->h;
@@ -23,6 +23,23 @@ bool CTexture::loadFromFile(std::string path) {
 		SDL_FreeSurface(loadedSurface);
 	}
 	_texture = newTexture;
+	return _texture != nullptr;
+}
+
+bool CTexture::loadFromText(std::string textureText, SDL_Color textColor, TTF_Font *font) {
+	free();
+
+	SDL_Surface* textSurface = TTF_RenderText_Solid(font, textureText.c_str(), textColor);
+	if (textSurface == nullptr) std::cout << "-Unable to Create Surface Text- Reason: " << TTF_GetError() << std::endl;
+	else {
+		_texture = SDL_CreateTextureFromSurface(_renderer, textSurface);
+		if (_texture == nullptr) std::cout << "-Unable to Create Texture Text- Reason: " << TTF_GetError() << std::endl;
+		else {
+			_width = textSurface->w;
+			_height = textSurface->h;
+		}
+		SDL_FreeSurface(textSurface);
+	}
 	return _texture != nullptr;
 }
 

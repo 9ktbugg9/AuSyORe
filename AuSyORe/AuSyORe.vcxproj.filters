@@ -13,11 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\Sprites">
-      <UniqueIdentifier>{7513fdf5-133b-41ad-bcdc-e4951d53d544}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Sprites">
+    <Filter Include="Header Files\Textures">
       <UniqueIdentifier>{5e254a8b-07e1-4abc-8768-04f34626a7bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Textures">
+      <UniqueIdentifier>{7513fdf5-133b-41ad-bcdc-e4951d53d544}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -37,13 +37,16 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CTexture.h">
-      <Filter>Header Files\Sprites</Filter>
+      <Filter>Header Files\Textures</Filter>
     </ClInclude>
     <ClInclude Include="SpriteMngr.h">
-      <Filter>Header Files\Sprites</Filter>
+      <Filter>Header Files\Textures</Filter>
     </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextMngr.h">
+      <Filter>Header Files\Textures</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -60,13 +63,16 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CTexture.cpp">
-      <Filter>Source Files\Sprites</Filter>
+      <Filter>Source Files\Textures</Filter>
     </ClCompile>
     <ClCompile Include="SpriteMngr.cpp">
-      <Filter>Source Files\Sprites</Filter>
+      <Filter>Source Files\Textures</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextMngr.cpp">
+      <Filter>Source Files\Textures</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

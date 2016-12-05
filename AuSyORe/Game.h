@@ -5,6 +5,7 @@
 #include "Window.h"
 #include "SpriteMngr.h"
 #include "AudioMngr.h"
+#include "TextMngr.h"
 
 #define WINDOW_NAME "AuSyORe"
 #define FPS 60
@@ -13,6 +14,7 @@ class Game {
 	Window *window;
 	AudioMngr *sounds;
 	SpriteMngr *sprites;
+	TextMngr *texts;
 
 	Uint32 startingTick, fpsTick;
 	int myFPS;
@@ -22,6 +24,9 @@ class Game {
 	void updateAll();
 	void renderAll();
 	void manageFPS();
+
+	bool tempText = false;
+	SDL_Rect tempPos = {20, 20, 555, 250};
 public:
 
 	void startLoop();
@@ -29,4 +34,3 @@ public:
 	Game() { init(); };
 	~Game();
 };
-

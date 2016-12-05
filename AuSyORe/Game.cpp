@@ -15,12 +15,24 @@ void Game::startLoop() {
 
 void Game::updateAll() {
 	// Update Stuff Here
+	std::string pass1 = "The central problems (or goals) of AI research include reasoning, knowledge, planning, learning, natural language processing, perception and the ability to move and manipulate objects. General intelligence is among the field's goals. Approaches include statistical methods, computational intelligence, soft computing, and traditional symbolic AI. Many tools are used, including versions of search and mathematical optimization, logic, methods based on probability and economics. The AI field draws upon computer science, mathematics, psychology, philosophy, neuroscience and artificial psychology.";
+	std::string pass2 = "A rainbow is a meteorological phenomenon that is caused by reflection, refraction and dispersion of light in water droplets resulting in a spectrum of light appearing in the sky. It takes the form of a multicoloured arc. Rainbows caused by sunlight always appear in the section of sky directly opposite the sun.";
+	if (!tempText) { texts->read(pass1, 0, tempPos); tempText = true; }
+	const Uint8 *CKS = SDL_GetKeyboardState(nullptr);
+	if(CKS[SDL_SCANCODE_E]) texts->read(pass2, 0, tempPos);
+	texts->pEvent(CKS);
+	texts->update();
 }
 
 void Game::renderAll() {
+	SDL_SetRenderDrawColor(window->_renderer, 0, 0, 0, 0);
+	SDL_RenderClear(window->_renderer);
 
 	// Render Stuff Here
-
+	SDL_SetRenderDrawColor(window->_renderer, 255, 255, 255, 255);
+	SDL_RenderDrawRect(window->_renderer, &tempPos);
+	texts->render();
+	
 	SDL_RenderPresent(window->_renderer);
 }
 
@@ -37,10 +49,11 @@ void Game::manageFPS() {
 
 void Game::init() {
 	window = new Window(WINDOW_NAME);
-	sounds = new AudioMngr;
 	sprites = new SpriteMngr(window->_renderer, window->_window);
+	texts = new TextMngr(window->_renderer, window->_window);
+	sounds = new AudioMngr;
 
-	Uint32 startingTick, fpsTick = SDL_GetTicks();
+	startingTick, fpsTick = SDL_GetTicks();
 	myFPS = 0;
 
 	SDL_SetRenderDrawColor(window->_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -48,7 +61,8 @@ void Game::init() {
 
 
 Game::~Game() {
-	delete(sprites);
-	delete(sounds);
-	delete(window);
+	delete(texts); texts = nullptr;
+	delete(sprites); sprites = nullptr;
+	delete(sounds); sounds = nullptr;
+	delete(window); window = nullptr;
 }
