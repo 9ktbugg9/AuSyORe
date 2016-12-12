@@ -2,7 +2,7 @@
 #include "TextMngr.h"
 
 
-TextMngr::TextMngr(SDL_Renderer *rendSrc, SDL_Window *windSrc) : _renderer(rendSrc), _window(windSrc) {
+TextMngr::TextMngr(SDL_Renderer *rendSrc, SDL_Window *windSrc, AudioMngr *soundSrc) : _renderer(rendSrc), _window(windSrc), _sounds(soundSrc) {
 	init();
 
 	_text.setSpecs(_renderer, _window);
@@ -12,7 +12,8 @@ TextMngr::TextMngr(SDL_Renderer *rendSrc, SDL_Window *windSrc) : _renderer(rendS
 void TextMngr::update() {
 	if (reading) {
 		readTime++;
-		if (readTime > 0) {
+		if (readTime > 1) {
+			Mix_PlayChannel(1, _sounds->text, 0);
 			readTime = 0;
 			for (int i = 0; i < _lineAmount; i++) {
 				if (_read[i] == _lines[i].length() || _read[i] == -1) continue;
@@ -22,8 +23,9 @@ void TextMngr::update() {
 			}
 			SDL_Color textColor = {255, 255, 255};
 			for (int i = 0; i < _lineAmount; i++)
-				if (_read[i] != -1 && _read[i] <= _lines[i].length())
+				if (_read[i] != -1 && _read[i] <= _lines[i].length()) {
 					_dispText[i].loadFromText(_manipLines[i], textColor, chintzy30);
+				}
 
 			bool brk = false;
 			for (int i = 0; i < _lineAmount; i++) if (_manipLines[i].length() < _lines[i].length()) brk = true;
@@ -36,25 +38,36 @@ void TextMngr::render() {
 	for (int i = 0; i < _lineAmount; i++) {
 		int x = _pos.x + edgeBuffer;
 		int y = _pos.y + edgeBuffer + (i * yIncrement) + yOffset;
-		if (_pos.y + _pos.h > y + _dispText[i].getHeight() && y > _pos.y + edgeBuffer - 1)
+		if (_pos.y + _pos.h + 27 > y + _dispText[i].getHeight() && y > _pos.y + edgeBuffer - 1 - 27)
 			_dispText[i].render(x, y);
 	}
+	SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 255);
+	for (int i = 0; i < 2; i++) SDL_RenderFillRect(_renderer, &_smooth[i]);
+
+	SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
+	SDL_RenderDrawRect(_renderer, &_pos);
 }
 
-void TextMngr::pEvent(const Uint8* CKS) {
-	std::cout << _pos.y + yOffset << " - " << _orgPos.y << " - " << _lineAmount << std::endl;
-	if (CKS[SDL_SCANCODE_UP]) {
-		if (_pos.y + yOffset < _orgPos.y + _dispText[0].getHeight()) yOffset += 2;
-	};
-	if (CKS[SDL_SCANCODE_DOWN]) {
-		if (_pos.y + yOffset - _orgPos.h > _orgPos.y - yIncrement * (_lineAmount + 1)) yOffset -= 2;
+void TextMngr::pEvent(SDL_Point mousePos, int &mouseScroll) {
+	bool outside = false;
+	if (_pos.y + _pos.h <= mousePos.y) outside = true;
+	if (_pos.y >= mousePos.y) outside = true;
+	if (_pos.x + _pos.w <= mousePos.x) outside = true;
+	if (_pos.x >= mousePos.x) outside = true;
+
+	if (!outside) {
+		if (mouseScroll > 0) if (_pos.y + yOffset < _orgPos.y + edgeBuffer) yOffset += 20;
+		if (mouseScroll < 0) if (_pos.y + yOffset - _orgPos.h > _orgPos.y - yIncrement * (_lineAmount + 1)) yOffset -= 20;
 	}
+	if (mouseScroll != 0) mouseScroll = 0;
 }
 
 void TextMngr::read(std::string dir, int line, SDL_Rect &pos) {
 	clean(true);
 	reading = true;
 	_pos = _orgPos = pos;
+	_smooth[0] = {_pos.x + 1, _pos.y + 1 - 27, _pos.w - 2, 27};
+	_smooth[1] = {_pos.x + 1, _pos.y + _pos.h, _pos.w - 2, 27};
 
 	std::string start = dir;
 

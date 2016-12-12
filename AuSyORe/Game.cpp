@@ -5,7 +5,7 @@ void Game::startLoop() {
 	while (true) {
 		startingTick = SDL_GetTicks(); myFPS++;
 
-		if (!window->pEvents()) break; // Handling Window events
+		if (!window->pEvents(mouseScroll)) break; // Handling Window events
 
 		updateAll(); // Update the game
 		renderAll(); // Render the game
@@ -20,7 +20,10 @@ void Game::updateAll() {
 	if (!tempText) { texts->read(pass1, 0, tempPos); tempText = true; }
 	const Uint8 *CKS = SDL_GetKeyboardState(nullptr);
 	if(CKS[SDL_SCANCODE_E]) texts->read(pass2, 0, tempPos);
-	texts->pEvent(CKS);
+	int mouseX, mouseY;
+	const Uint16 CMS = SDL_GetMouseState(&mouseX, &mouseY);
+	SDL_Point mousePos{mouseX, mouseY};
+	texts->pEvent(mousePos, mouseScroll);
 	texts->update();
 }
 
@@ -29,8 +32,6 @@ void Game::renderAll() {
 	SDL_RenderClear(window->_renderer);
 
 	// Render Stuff Here
-	SDL_SetRenderDrawColor(window->_renderer, 255, 255, 255, 255);
-	SDL_RenderDrawRect(window->_renderer, &tempPos);
 	texts->render();
 	
 	SDL_RenderPresent(window->_renderer);
@@ -50,8 +51,8 @@ void Game::manageFPS() {
 void Game::init() {
 	window = new Window(WINDOW_NAME);
 	sprites = new SpriteMngr(window->_renderer, window->_window);
-	texts = new TextMngr(window->_renderer, window->_window);
 	sounds = new AudioMngr;
+	texts = new TextMngr(window->_renderer, window->_window, sounds);
 
 	startingTick, fpsTick = SDL_GetTicks();
 	myFPS = 0;

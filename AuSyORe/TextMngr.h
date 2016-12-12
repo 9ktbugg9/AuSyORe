@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include "AudioMngr.h"
 #include "CTexture.h"
 
 
@@ -10,6 +11,7 @@ class TextMngr {
 private:
 	SDL_Renderer *_renderer;
 	SDL_Window *_window;
+	AudioMngr *_sounds;
 
 	TTF_Font *chintzy30 = nullptr;
 
@@ -19,7 +21,7 @@ private:
 	std::vector<int> _read;
 	std::vector<CTexture> _dispText;
 	int _lineAmount = 0, readTime = 0, edgeBuffer = 5, yOffset = 0, yIncrement = 23;
-	SDL_Rect _pos, _orgPos;
+	SDL_Rect _pos, _orgPos, _smooth[2];
 
 	void init();
 	void setupFont(TTF_Font *, std::string);
@@ -28,12 +30,11 @@ public:
 	bool reading = false;
 
 	void read(std::string, int, SDL_Rect &);
-	void pEvent(const Uint8 *);
+	void pEvent(SDL_Point, int &);
 	void update();
 	void render();
 
-	TextMngr(SDL_Renderer *, SDL_Window *);
+	TextMngr(SDL_Renderer *, SDL_Window *, AudioMngr *);
 	~TextMngr();
 };
 
-// Render text one letter at a time by creating full texture, then only rendering current letters. 

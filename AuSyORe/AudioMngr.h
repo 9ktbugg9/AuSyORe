@@ -8,7 +8,7 @@ private:
 
 
 public:
-	//Mix_Chunk *sound = NULL;
+	Mix_Chunk *text = NULL;
 
 	AudioMngr();
 	~AudioMngr();

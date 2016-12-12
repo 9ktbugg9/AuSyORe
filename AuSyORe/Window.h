@@ -21,7 +21,7 @@ public:
 	SDL_Window* _window = NULL;
 	SDL_Renderer* _renderer = NULL;
 
-	bool pEvents();
+	bool pEvents(int &);
 
 	int getWidth() { return SCREEN_WIDTH; }
 	int getHeight() { return SCREEN_HEIGHT; }

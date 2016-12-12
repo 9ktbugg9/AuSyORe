@@ -3,16 +3,16 @@
 
 
 AudioMngr::AudioMngr() {
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) < 0)
+	if (Mix_OpenAudio(105000, MIX_DEFAULT_FORMAT, 2, 4096)  < 0)
 		std::cout << "-SDL_Mixer Error- Reason: " << Mix_GetError() << std::endl;
 
-	//sound = Mix_LoadWAV("sounds/sound.wav");
+	text = Mix_LoadWAV("res/sounds/click1.wav");
 
 }
 
 
 AudioMngr::~AudioMngr() {
-	//Mix_FreeChunk(sound);
+	Mix_FreeChunk(text);
 
 	Mix_Quit();
 }

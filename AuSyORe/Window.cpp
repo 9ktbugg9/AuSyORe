@@ -47,17 +47,19 @@ bool Window::init(string WINDOW_NAME) {
 	}
 	return success;
 }
-bool Window::pEvents() {
+
+bool Window::pEvents(int &mouseY) {
 	SDL_Event event;
 
 	SDL_PumpEvents();
-	SDL_FlushEvents(257, 261);
+	SDL_FlushEvents(SDL_USEREVENT, SDL_LASTEVENT);
 	if (SDL_PollEvent(&event) != NULL) {
 		switch (event.type) {
 			case SDL_QUIT: return false; break;
 
-			case SDL_KEYDOWN:
-				if (event.key.keysym.sym == SDLK_ESCAPE) return false; break;
+			case SDL_KEYDOWN: if (event.key.keysym.sym == SDLK_ESCAPE) return false; break;
+
+			case SDL_MOUSEWHEEL: mouseY = event.wheel.y;
 
 			default: break;
 		}
