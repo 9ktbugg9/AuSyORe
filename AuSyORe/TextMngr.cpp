@@ -6,7 +6,6 @@ TextMngr::TextMngr(SDL_Renderer *rendSrc, SDL_Window *windSrc, AudioMngr *soundS
 	init();
 
 	_text.setSpecs(_renderer, _window);
-
 }
 
 void TextMngr::update() {
@@ -29,7 +28,14 @@ void TextMngr::update() {
 
 			bool brk = false;
 			for (int i = 0; i < _lineAmount; i++) if (_manipLines[i].length() < _lines[i].length()) brk = true;
-			if (!brk) { reading = false; clean(false); }
+			if (!brk) { reading = false; clean(false); _continuePrime = true; }
+		}
+	}
+	else if (_continue) {
+		_continue = false;
+		if (_lineInc < _dialogueLines.size()) {
+			read(_dialogueLines[_lineInc], _pos);
+			_lineInc++;
 		}
 	}
 }
@@ -48,7 +54,17 @@ void TextMngr::render() {
 	SDL_RenderDrawRect(_renderer, &_pos);
 }
 
-void TextMngr::pEvent(SDL_Point mousePos, int &mouseScroll) {
+void TextMngr::pEvent(const Uint8 *CKS, SDL_Point mousePos, int &mouseScroll) {
+
+	bool keyPress = false;
+	for (int i = 0; i < 90; i++)
+		if (CKS[i]) keyPress = true;
+	if (keyPress) {
+		_continuePrime = false;
+		_continue = true;
+	}
+	else _continue = false;
+
 	bool outside = false;
 	if (_pos.y + _pos.h <= mousePos.y) outside = true;
 	if (_pos.y >= mousePos.y) outside = true;
@@ -62,14 +78,42 @@ void TextMngr::pEvent(SDL_Point mousePos, int &mouseScroll) {
 	if (mouseScroll != 0) mouseScroll = 0;
 }
 
-void TextMngr::read(std::string dir, int line, SDL_Rect &pos) {
+void TextMngr::read(int readStart, int readStop, std::string dir, SDL_Rect &pos) {
+	std::ifstream fin(dir);
+	if (!fin) std::cout << "-Could Not Load Dialogue File-";
+	std::string tempLine;
+	int line = 1;
+	while (std::getline(fin, tempLine)) {
+		if (line >= readStart && line <= readStop)
+			_dialogueLines.push_back(tempLine);
+		line++;
+	}
+
+	fin.close();
+
+	_moreLine = true;
+	read(_dialogueLines[_lineInc], pos);
+	_lineInc++;
+}
+
+void TextMngr::parseString(std::string src, std::string delStart, std::string delStop, std::string &out) {
+	int start = src.find(delStart);
+	if (start >= 0) {
+		std::string tstr = src.substr(start + delStart.length());
+		int stop = tstr.find(delStop);
+		if (stop > 1)
+			out = src.substr(start + delStart.length(), stop);
+	}
+}
+
+void TextMngr::read(std::string text, SDL_Rect &pos) {
 	clean(true);
 	reading = true;
 	_pos = _orgPos = pos;
 	_smooth[0] = {_pos.x + 1, _pos.y + 1 - 27, _pos.w - 2, 27};
 	_smooth[1] = {_pos.x + 1, _pos.y + _pos.h, _pos.w - 2, 27};
 
-	std::string start = dir;
+	std::string start = text;
 
 	SDL_Color textColor = {0, 0, 0};
 	_text.loadFromText(start, textColor, chintzy30);
@@ -126,6 +170,8 @@ void TextMngr::init() {
 	std::ifstream test("res/fonts/chintzy30.txt");
 	if (!test.is_open()) setupFont(chintzy30, "chintzy30");
 	test.close();
+
+	_pos = {-1, -1, 0, 0};
 }
 
 void TextMngr::setupFont(TTF_Font *font, std::string name) {

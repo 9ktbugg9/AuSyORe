@@ -26,7 +26,6 @@ class Game {
 	void manageFPS();
 
 	int mouseScroll = 0;
-	bool tempText = false;
 	SDL_Rect tempPos = {20, 20, 820, 250};
 public:
 

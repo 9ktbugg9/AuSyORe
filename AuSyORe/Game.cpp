@@ -2,6 +2,9 @@
 #include "Game.h"
 
 void Game::startLoop() {
+
+	texts->read(0, 6, "res/dialogue/temp.txt", tempPos);
+
 	while (true) {
 		startingTick = SDL_GetTicks(); myFPS++;
 
@@ -15,15 +18,13 @@ void Game::startLoop() {
 
 void Game::updateAll() {
 	// Update Stuff Here
-	std::string pass1 = "The central problems (or goals) of AI research include reasoning, knowledge, planning, learning, natural language processing, perception and the ability to move and manipulate objects. General intelligence is among the field's goals. Approaches include statistical methods, computational intelligence, soft computing, and traditional symbolic AI. Many tools are used, including versions of search and mathematical optimization, logic, methods based on probability and economics. The AI field draws upon computer science, mathematics, psychology, philosophy, neuroscience and artificial psychology.";
-	std::string pass2 = "A rainbow is a meteorological phenomenon that is caused by reflection, refraction and dispersion of light in water droplets resulting in a spectrum of light appearing in the sky. It takes the form of a multicoloured arc. Rainbows caused by sunlight always appear in the section of sky directly opposite the sun.";
-	if (!tempText) { texts->read(pass1, 0, tempPos); tempText = true; }
 	const Uint8 *CKS = SDL_GetKeyboardState(nullptr);
-	if(CKS[SDL_SCANCODE_E]) texts->read(pass2, 0, tempPos);
+
+
 	int mouseX, mouseY;
 	const Uint16 CMS = SDL_GetMouseState(&mouseX, &mouseY);
 	SDL_Point mousePos{mouseX, mouseY};
-	texts->pEvent(mousePos, mouseScroll);
+	texts->pEvent(CKS, mousePos, mouseScroll);
 	texts->update();
 }
 
@@ -56,8 +57,6 @@ void Game::init() {
 
 	startingTick, fpsTick = SDL_GetTicks();
 	myFPS = 0;
-
-	SDL_SetRenderDrawColor(window->_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 }
 
 
