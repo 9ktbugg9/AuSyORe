@@ -26,7 +26,7 @@ class Game {
 	void manageFPS();
 
 	int mouseScroll = 0;
-	SDL_Rect tempPos = {20, 20, 820, 250};
+	SDL_Rect tempPos = {20, 20, 800 - 40, 800 * 9 / 16 - 40};
 public:
 
 	void startLoop();

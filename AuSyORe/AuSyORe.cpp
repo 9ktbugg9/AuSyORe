@@ -4,8 +4,9 @@
 
 #include "Game.h"
 
+#undef main
 
-int main(int args, char* argc[]) {
+int main(int argc, char** argv[]) {
 	srand(unsigned(time(nullptr)));
 
 	try {

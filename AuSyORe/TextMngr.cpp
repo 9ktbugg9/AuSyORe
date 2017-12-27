@@ -3,41 +3,54 @@
 
 
 TextMngr::TextMngr(SDL_Renderer *rendSrc, SDL_Window *windSrc, AudioMngr *soundSrc) : _renderer(rendSrc), _window(windSrc), _sounds(soundSrc) {
-	init();
-
 	_text.setSpecs(_renderer, _window);
+
+	init();
 }
 
-void TextMngr::update() {
-	if (reading) {
-		readTime++;
-		if (readTime > 1) {
-			Mix_PlayChannel(1, _sounds->text, 0);
-			readTime = 0;
-			for (int i = 0; i < _lineAmount; i++) {
-				if (_read[i] == _lines[i].length() || _read[i] == -1) continue;
-				std::string temp = _lines[i];
-				_manipLines[i].push_back(temp[_read[i]++]);
-				if (_read[i] == _lines[i].length() && i < _lineAmount - 1) _read[i + 1] = 0;
-			}
-			SDL_Color textColor = {255, 255, 255};
-			for (int i = 0; i < _lineAmount; i++)
-				if (_read[i] != -1 && _read[i] <= _lines[i].length()) {
-					_dispText[i].loadFromText(_manipLines[i], textColor, chintzy30);
+void TextMngr::update(const Uint8 *CKS, SDL_Point mousePos, int &mouseScroll) {
+
+	pEvent(CKS, mousePos, mouseScroll);
+
+	if (_skipBufferTime < 10)
+		_skipBufferTime++;
+	int tempSkipTimer;
+	if (_skip == true)
+		tempSkipTimer = 10;
+	else
+	tempSkipTimer = 1;
+	for (int z = 0; z < tempSkipTimer; z++)
+		if (reading) {
+			readTime++;
+			if (readTime > 1) {
+				Mix_PlayChannel(1, _sounds->text, 0);
+				readTime = 0;
+				for (int i = 0; i < _lineAmount; i++) {
+					if (_read[i] == _lines[i].length() || _read[i] == -1) continue;
+					std::string temp = _lines[i];
+					_manipLines[i].push_back(temp[_read[i]++]);
+					if (_read[i] == _lines[i].length() && i < _lineAmount - 1) _read[i + 1] = 0;
 				}
 
-			bool brk = false;
-			for (int i = 0; i < _lineAmount; i++) if (_manipLines[i].length() < _lines[i].length()) brk = true;
-			if (!brk) { reading = false; clean(false); _continuePrime = true; }
+				for (int i = 0; i < _lineAmount; i++)
+					if (_read[i] != -1 && _read[i] <= _lines[i].length()) {
+						_dispText[i].loadFromText(_manipLines[i], _textColor, chintzy30);
+					}
+
+				bool brk = false;
+				brk = false;
+				for (int i = 0; i < _lineAmount; i++) if (_manipLines[i].length() < _lines[i].length()) brk = true;
+				if (!brk) { reading = false; clean(false); _continuePrime = true; }
+			}
 		}
-	}
-	else if (_continue) {
-		_continue = false;
-		if (_lineInc < _dialogueLines.size()) {
-			read(_dialogueLines[_lineInc], _pos);
-			_lineInc++;
+		else if (_continue) {
+			_skipBufferTime = 0;
+			_continue = false;
+			if (_lineInc < _dialogueLines.size()) {
+				read(_dialogueLines[_lineInc], _pos);
+				_lineInc++;
+			}
 		}
-	}
 }
 
 void TextMngr::render() {
@@ -59,9 +72,15 @@ void TextMngr::pEvent(const Uint8 *CKS, SDL_Point mousePos, int &mouseScroll) {
 	bool keyPress = false;
 	for (int i = 0; i < 90; i++)
 		if (CKS[i]) keyPress = true;
-	if (keyPress) {
+
+	if (reading && keyPress && _skipBufferTime == 10) {
+		_skip = true;
+	}
+	else if (keyPress) {
 		_continuePrime = false;
 		_continue = true;
+		_skip = false;
+		yOffset = 0;
 	}
 	else _continue = false;
 
@@ -78,7 +97,7 @@ void TextMngr::pEvent(const Uint8 *CKS, SDL_Point mousePos, int &mouseScroll) {
 	if (mouseScroll != 0) mouseScroll = 0;
 }
 
-void TextMngr::read(int readStart, int readStop, std::string dir, SDL_Rect &pos) {
+void TextMngr::readFile(int readStart, int readStop, std::string dir, SDL_Rect &pos) {
 	std::ifstream fin(dir);
 	if (!fin) std::cout << "-Could Not Load Dialogue File-";
 	std::string tempLine;
@@ -90,6 +109,29 @@ void TextMngr::read(int readStart, int readStop, std::string dir, SDL_Rect &pos)
 	}
 
 	fin.close();
+	std::string tempString("");
+	int effectNum = -1;
+	bool effectStart = false, smallStart = false;
+	for (int i = 0; i < _dialogueLines.size(); i++) {
+		std::string temp(_dialogueLines[i]);
+		for (int f = 0; f < _dialogueLines[i].length(); f++) {
+			if (temp[f] == '|') {
+				smallStart = !smallStart;
+				if (!smallStart) {
+					tempString.erase(tempString.begin());
+					_effects[effectNum].effect = tempString;
+					tempString = "";
+				}
+				if (smallStart) {
+					effectNum++;
+					EffectStore temp1{i, f, ""};
+					_effects.push_back(temp1);
+				}
+			}
+			if (smallStart)
+				tempString += temp[f];
+		}
+	}
 
 	_moreLine = true;
 	read(_dialogueLines[_lineInc], pos);
@@ -127,8 +169,6 @@ void TextMngr::read(std::string text, SDL_Rect &pos) {
 		words.push_back(temp);
 	}
 
-	std::string testing;
-
 	int inc = 0;
 	_lines.push_back(words[0] + " ");
 	for (int i = 1; i < words.size(); i++) {
@@ -159,6 +199,7 @@ void TextMngr::clean(bool full) {
 	_lines.clear();
 	_read.clear();
 	_text.free();
+	_skipBufferTime = 0;
 }
 
 void TextMngr::init() {
@@ -167,11 +208,13 @@ void TextMngr::init() {
 	chintzy30 = TTF_OpenFont("res/fonts/chintzy.ttf", 30);
 	if (chintzy30 == NULL) std::cout << "-Failed to Load Font \"chintzy30\"- Reason: " << TTF_GetError() << std::endl;
 
-	std::ifstream test("res/fonts/chintzy30.txt");
-	if (!test.is_open()) setupFont(chintzy30, "chintzy30");
-	test.close();
+	std::ifstream temp("res/fonts/chintzy30.txt");
+	if (!temp.is_open()) setupFont(chintzy30, "chintzy30");
+	temp.close();
 
 	_pos = {-1, -1, 0, 0};
+	_text.loadFromText("Sample", _textColor, chintzy30);
+	yIncrement = _text.getHeight();
 }
 
 void TextMngr::setupFont(TTF_Font *font, std::string name) {

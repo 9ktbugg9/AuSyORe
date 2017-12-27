@@ -8,7 +8,7 @@ bool Window::init(string WINDOW_NAME) {
 		success = false;
 	}
 	else {
-		SCREEN_WIDTH = 860;
+		SCREEN_WIDTH = 800;
 		SCREEN_HEIGHT = SCREEN_WIDTH * 9 / 16;
 		_window = SDL_CreateWindow(WINDOW_NAME.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 		if (_window == NULL) {

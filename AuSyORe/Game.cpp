@@ -3,7 +3,7 @@
 
 void Game::startLoop() {
 
-	texts->read(0, 6, "res/dialogue/temp.txt", tempPos);
+	texts->readFile(0, 9 + 7, "res/dialogue/temp.txt", tempPos);
 
 	while (true) {
 		startingTick = SDL_GetTicks(); myFPS++;
@@ -17,15 +17,14 @@ void Game::startLoop() {
 }
 
 void Game::updateAll() {
-	// Update Stuff Here
+	// Update Stuff Here+
+
 	const Uint8 *CKS = SDL_GetKeyboardState(nullptr);
-
-
 	int mouseX, mouseY;
 	const Uint16 CMS = SDL_GetMouseState(&mouseX, &mouseY);
 	SDL_Point mousePos{mouseX, mouseY};
-	texts->pEvent(CKS, mousePos, mouseScroll);
-	texts->update();
+
+	texts->update(CKS, mousePos, mouseScroll);
 }
 
 void Game::renderAll() {
