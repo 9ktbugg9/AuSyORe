@@ -15,9 +15,7 @@ bool Window::init(string WINDOW_NAME) {
 			cout << "-Window Creation Failed- Reason: " << SDL_GetError() << endl;
 			success = false;
 		}
-
 		else {
-
 			_renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_PRESENTVSYNC);
 
 			SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
@@ -26,7 +24,6 @@ bool Window::init(string WINDOW_NAME) {
 				cout << "-Renderer Creation Failed- Reason: " << SDL_GetError() << endl;
 				success = false;
 			}
-
 			else {
 				int imgFlags = IMG_INIT_PNG;
 				if (!(IMG_Init(imgFlags) & imgFlags)) {
@@ -56,11 +53,8 @@ bool Window::pEvents(int &mouseY) {
 	if (SDL_PollEvent(&event) != NULL) {
 		switch (event.type) {
 			case SDL_QUIT: return false; break;
-
 			case SDL_KEYDOWN: if (event.key.keysym.sym == SDLK_ESCAPE) return false; break;
-
 			case SDL_MOUSEWHEEL: mouseY = event.wheel.y;
-
 			default: break;
 		}
 	}
@@ -70,12 +64,10 @@ bool Window::pEvents(int &mouseY) {
 SDL_Texture* Window::loadTexture(string path) {
 	SDL_Texture* newTexture = NULL;
 	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-	if (loadedSurface == NULL)
-		cout << "-Unable to Load Image- Image: " << path.c_str() << "Reason: " << IMG_GetError() << endl;
+	if (loadedSurface == NULL) cout << "-Unable to Load Image- Image: " << path.c_str() << "Reason: " << IMG_GetError() << endl;
 	else {
 		newTexture = SDL_CreateTextureFromSurface(_renderer, loadedSurface);
-		if (newTexture == NULL)
-			cout << "-Unable to Create Texture- Image: " << path.c_str() << "Reason: " << SDL_GetError() << endl;
+		if (newTexture == NULL) cout << "-Unable to Create Texture- Image: " << path.c_str() << "Reason: " << SDL_GetError() << endl;
 		SDL_FreeSurface(loadedSurface);
 	}
 	return newTexture;

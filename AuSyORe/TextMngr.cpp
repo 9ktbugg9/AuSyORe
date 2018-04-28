@@ -12,19 +12,17 @@ void TextMngr::update(const Uint8 *CKS, SDL_Point mousePos, int &mouseScroll) {
 
 	pEvent(CKS, mousePos, mouseScroll);
 
-	if (_skipBufferTime < 10)
-		_skipBufferTime++;
+	if (_skipBufferTime < 10) _skipBufferTime++;
 	int tempSkipTimer;
-	if (_skip == true)
-		tempSkipTimer = 10;
-	else
-	tempSkipTimer = 1;
+	if (_skip == true) tempSkipTimer = 10;
+	else tempSkipTimer = 1;
+
 	for (int z = 0; z < tempSkipTimer; z++)
 		if (reading) {
-			readTime++;
-			if (readTime > 1) {
+			_readTime++;
+			if (_readTime > 1) {
 				Mix_PlayChannel(1, _sounds->text, 0);
-				readTime = 0;
+				_readTime = 0;
 				for (int i = 0; i < _lineAmount; i++) {
 					if (_read[i] == _lines[i].length() || _read[i] == -1) continue;
 					std::string temp = _lines[i];
@@ -38,8 +36,9 @@ void TextMngr::update(const Uint8 *CKS, SDL_Point mousePos, int &mouseScroll) {
 					}
 
 				bool brk = false;
-				brk = false;
-				for (int i = 0; i < _lineAmount; i++) if (_manipLines[i].length() < _lines[i].length()) brk = true;
+				for (int i = 0; i < _lineAmount; i++) 
+					if (_manipLines[i].length() < _lines[i].length()) brk = true;
+
 				if (!brk) { reading = false; clean(false); _continuePrime = true; }
 			}
 		}
@@ -55,9 +54,9 @@ void TextMngr::update(const Uint8 *CKS, SDL_Point mousePos, int &mouseScroll) {
 
 void TextMngr::render() {
 	for (int i = 0; i < _lineAmount; i++) {
-		int x = _pos.x + edgeBuffer;
-		int y = _pos.y + edgeBuffer + (i * yIncrement) + yOffset;
-		if (_pos.y + _pos.h + 27 > y + _dispText[i].getHeight() && y > _pos.y + edgeBuffer - 1 - 27)
+		int x = _pos.x + _edgeBuffer;
+		int y = _pos.y + _edgeBuffer + (i * _yIncrement) + _yOffset;
+		if (_pos.y + _pos.h + 27 > y + _dispText[i].getHeight() && y > _pos.y + _edgeBuffer - 1 - 27)
 			_dispText[i].render(x, y);
 	}
 	SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 255);
@@ -80,7 +79,7 @@ void TextMngr::pEvent(const Uint8 *CKS, SDL_Point mousePos, int &mouseScroll) {
 		_continuePrime = false;
 		_continue = true;
 		_skip = false;
-		yOffset = 0;
+		_yOffset = 0;
 	}
 	else _continue = false;
 
@@ -91,8 +90,8 @@ void TextMngr::pEvent(const Uint8 *CKS, SDL_Point mousePos, int &mouseScroll) {
 	if (_pos.x >= mousePos.x) outside = true;
 
 	if (!outside) {
-		if (mouseScroll > 0) if (_pos.y + yOffset < _orgPos.y + edgeBuffer) yOffset += 20;
-		if (mouseScroll < 0) if (_pos.y + yOffset - _orgPos.h > _orgPos.y - yIncrement * (_lineAmount + 1)) yOffset -= 20;
+		if (mouseScroll > 0) if (_pos.y + _yOffset < _orgPos.y + _edgeBuffer) _yOffset += 20;
+		if (mouseScroll < 0) if (_pos.y + _yOffset - _orgPos.h > _orgPos.y - _yIncrement * (_lineAmount + 1)) _yOffset -= 20;
 	}
 	if (mouseScroll != 0) mouseScroll = 0;
 }
@@ -175,7 +174,7 @@ void TextMngr::read(std::string text, SDL_Rect &pos) {
 		std::string temp = _lines[inc];
 		temp.append(words[i]);
 		_text.loadFromText(temp, textColor, chintzy30);
-		if (_text.getWidth() >= pos.w - edgeBuffer) { inc++; _lines.push_back(words[i] + " "); }
+		if (_text.getWidth() >= pos.w - _edgeBuffer) { inc++; _lines.push_back(words[i] + " "); }
 		else if (i == words.size() - 1) _lines[inc].append(words[i]);
 		else _lines[inc].append(words[i] + " ");
 	}
@@ -214,7 +213,7 @@ void TextMngr::init() {
 
 	_pos = {-1, -1, 0, 0};
 	_text.loadFromText("Sample", _textColor, chintzy30);
-	yIncrement = _text.getHeight();
+	_yIncrement = _text.getHeight();
 }
 
 void TextMngr::setupFont(TTF_Font *font, std::string name) {
@@ -238,6 +237,7 @@ void TextMngr::setupFont(TTF_Font *font, std::string name) {
 TextMngr::~TextMngr() {
 	clean(true);
 	TTF_CloseFont(chintzy30);
+	TTF_CloseFont(chintzy120);
 
 	TTF_Quit();
 }

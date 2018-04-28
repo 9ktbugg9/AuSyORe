@@ -9,13 +9,11 @@ bool CTexture::loadFromFile(std::string path) {
 	SDL_Texture* newTexture = nullptr;
 
 	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-	if (loadedSurface == nullptr)
-		std::cout << "-Unable to Load Image- Reason: " << IMG_GetError() << "  -Path: " << path.c_str() << std::endl;
+	if (loadedSurface == nullptr) std::cout << "-Unable to Load Image- Reason: " << IMG_GetError() << "  -Path: " << path.c_str() << std::endl;
 	else {
 		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xFF, 0x00, 0xFF));
 		newTexture = SDL_CreateTextureFromSurface(_renderer, loadedSurface);
-		if (newTexture == nullptr)
-			std::cout << "-Unable to Create Texture- Reason: " << SDL_GetError() << "  -Path: " << path.c_str() << std::endl;
+		if (newTexture == nullptr) std::cout << "-Unable to Create Texture- Reason: " << SDL_GetError() << "  -Path: " << path.c_str() << std::endl;
 		else {
 			_width = loadedSurface->w;
 			_height = loadedSurface->h;
@@ -53,10 +51,8 @@ void CTexture::free() {
 
 void CTexture::render(int x, int y, SDL_Rect* clip, double scaleW, double scaleH, int sW, int sH, double angle, SDL_Point center, SDL_RendererFlip flip) {
 	SDL_Rect renderQuad = {x, y, _width, _height};
-	if (scaleW == 0)
-		scaleW = 1;
-	if (scaleH == 0)
-		scaleH = 1;
+	if (scaleW == 0) scaleW = 1;
+	if (scaleH == 0) scaleH = 1;
 	if (clip != nullptr) {
 		if (sW != 0 && sH != 0) {
 			renderQuad.w = sW;

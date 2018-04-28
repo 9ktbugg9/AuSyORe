@@ -9,11 +9,6 @@
 using namespace std;
 
 class Window {
-private:
-	void close();
-	bool init(string);
-	int SCREEN_WIDTH, SCREEN_HEIGHT;
-
 public:
 
 	SDL_Texture* loadTexture(string path);
@@ -29,5 +24,10 @@ public:
 
 	Window(string winName) { init(winName); }
 	~Window() { close(); }
+
+private:
+	void close();
+	bool init(string);
+	int SCREEN_WIDTH, SCREEN_HEIGHT;
 };
 

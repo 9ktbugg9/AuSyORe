@@ -11,6 +11,14 @@
 #define FPS 60
 
 class Game {
+public:
+
+	void startLoop();
+
+	Game() { init(); };
+	~Game();
+
+private:
 	Window *window;
 	AudioMngr *sounds;
 	SpriteMngr *sprites;
@@ -27,10 +35,4 @@ class Game {
 
 	int mouseScroll = 0;
 	SDL_Rect tempPos = {20, 20, 800 - 40, 800 * 9 / 16 - 40};
-public:
-
-	void startLoop();
-
-	Game() { init(); };
-	~Game();
 };

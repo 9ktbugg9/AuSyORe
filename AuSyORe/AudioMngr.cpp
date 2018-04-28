@@ -7,7 +7,6 @@ AudioMngr::AudioMngr() {
 		std::cout << "-SDL_Mixer Error- Reason: " << Mix_GetError() << std::endl;
 
 	text = Mix_LoadWAV("res/sounds/click1.wav");
-
 }
 
 

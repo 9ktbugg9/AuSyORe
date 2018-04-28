@@ -17,7 +17,6 @@ void Game::startLoop() {
 }
 
 void Game::updateAll() {
-	// Update Stuff Here+
 
 	const Uint8 *CKS = SDL_GetKeyboardState(nullptr);
 	int mouseX, mouseY;
@@ -31,7 +30,6 @@ void Game::renderAll() {
 	SDL_SetRenderDrawColor(window->_renderer, 0, 0, 0, 0);
 	SDL_RenderClear(window->_renderer);
 
-	// Render Stuff Here
 	texts->render();
 	
 	SDL_RenderPresent(window->_renderer);
